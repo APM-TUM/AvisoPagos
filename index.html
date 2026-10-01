@@ -93,6 +93,17 @@ h1 .dim{display:block;color:rgba(250,247,244,.22)}
 .step strong{display:block;color:var(--h1);font-family:var(--font-h);font-size:14px;margin-bottom:2px}
 .step p{font-size:13px;line-height:1.55}
 
+/* FORMULARIO DE CODIGO */
+.gate{display:flex;flex-wrap:wrap;gap:10px;max-width:460px}
+.gate input{flex:1 1 170px;min-width:0;background:rgba(14,11,8,.75);border:1px solid var(--orange-border);border-radius:4px;color:var(--h1);
+  font-family:var(--font-h);font-size:16px;font-weight:700;letter-spacing:.12em;padding:15px 18px;outline:none;transition:border-color .2s,box-shadow .2s}
+.gate input::placeholder{color:var(--muted);letter-spacing:.02em;font-weight:500}
+.gate input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(200,92,42,.18)}
+.gate button{border:0;cursor:pointer}
+.gate button:disabled{opacity:.6;cursor:wait}
+.msg{margin-top:14px;font-size:13px;min-height:20px}
+.msg.err{color:#ff8a65}.msg.ok{color:#8fd694}
+
 footer{border-top:1px solid rgba(200,92,42,.2);background:#0e0c0a;padding:20px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
 footer a{color:var(--orange-light);text-decoration:none}
 
@@ -128,17 +139,21 @@ footer a{color:var(--orange-light);text-decoration:none}
       <span class="badge"><i></i> Android · Versión 1.0.0</span>
       <h1>AvisoPagos<br><span class="acc">en tu celular.</span><span class="dim">Instalala en minutos.</span></h1>
       <p class="lead">Tecnología que <b>funciona desde el primer día</b>. Descargala, instalala y empezá a usarla — <b>sin capacitación.</b></p>
-      <a class="btn-primary" href="https://github.com/APM-TUM/AvisoPagos/releases/latest/download/AvisoPagos.apk" download>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
-        Descargar APK
-      </a>
-      <p class="meta">AvisoPagos.apk · 955 KB · Siempre la última versión</p>
+      <form class="gate" id="gate" autocomplete="off">
+        <input id="codigo" type="text" inputmode="numeric" placeholder="Tu código de descarga" aria-label="Código de descarga" required>
+        <button class="btn-primary" id="btn" type="submit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
+          Descargar APK
+        </button>
+      </form>
+      <p class="msg" id="msg" role="status"></p>
+      <p class="meta">AvisoPagos.apk · 955 KB · ¿No tenés código? <a href="https://wa.me/59164542598" style="color:var(--orange-light)">Pedilo por WhatsApp</a></p>
     </div>
 
     <div class="svc">
       <h2>Cómo instalar <span>AvisoPagos</span></h2>
       <p class="sub">Tres pasos. Sin complicaciones.</p>
-      <div class="step"><b>1</b><div><strong>Descargá el archivo</strong><p>Tocá el botón. Si Chrome avisa, elegí "Descargar de todos modos".</p></div></div>
+      <div class="step"><b>1</b><div><strong>Ingresá tu código</strong><p>Escribilo y tocá Descargar APK. Si Chrome avisa, elegí "Descargar de todos modos".</p></div></div>
       <div class="step"><b>2</b><div><strong>Abrilo</strong><p>Buscalo en las notificaciones o en la carpeta Descargas.</p></div></div>
       <div class="step"><b>3</b><div><strong>Permití la instalación</strong><p>Si Android lo pide, activá "Instalar apps de orígenes desconocidos" para tu navegador.</p></div></div>
     </div>
@@ -149,5 +164,28 @@ footer a{color:var(--orange-light);text-decoration:none}
   <span>© A TUM · Construido en Santa Cruz · Bolivia</span>
   <a href="https://apm-tum.github.io/ATUM/">Conocé más de A TUM</a>
 </footer>
+<script>
+const SCRIPT_URL = "PEGA_AQUI_LA_URL_EXEC_DE_TU_SCRIPT";
+const APK_URL = "https://github.com/APM-TUM/AvisoPagos/releases/latest/download/AvisoPagos.apk";
+const form = document.getElementById("gate"), btn = document.getElementById("btn"),
+      msg = document.getElementById("msg"), inp = document.getElementById("codigo");
+function say(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
+form.addEventListener("submit", async function(ev){
+  ev.preventDefault();
+  const codigo = inp.value.trim();
+  if(!codigo) return say("Ingresá tu código.", "err");
+  btn.disabled = true; say("Verificando código…");
+  try{
+    const r = await fetch(SCRIPT_URL + "?accion=validar&codigo=" + encodeURIComponent(codigo));
+    const d = await r.json();
+    if(!d.ok){ say(d.error || "No se pudo verificar el código.", "err"); return; }
+    say("Código correcto. Tu descarga empezó.", "ok");
+    const a = document.createElement("a"); a.href = APK_URL; a.download = "AvisoPagos.apk";
+    document.body.appendChild(a); a.click(); a.remove();
+  }catch(e){
+    say("No pudimos conectar. Revisá tu internet e intentá de nuevo.", "err");
+  }finally{ btn.disabled = false; }
+});
+</script>
 </body>
 </html>
