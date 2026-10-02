@@ -92,6 +92,9 @@ h1 .dim{display:block;color:rgba(250,247,244,.22)}
   color:var(--orange-light);font-family:var(--font-h);font-size:12px;display:grid;place-items:center}
 .step strong{display:block;color:var(--h1);font-family:var(--font-h);font-size:14px;margin-bottom:2px}
 .step p{font-size:13px;line-height:1.55}
+.note{position:relative;z-index:1;margin-top:4px;padding:13px 14px;border:1px solid var(--orange-border);background:rgba(200,92,42,.08);
+  border-radius:10px;font-size:12.5px;line-height:1.55}
+.note strong{color:var(--h1)}
 
 /* FORMULARIO DE CODIGO */
 .gate{display:flex;flex-wrap:wrap;gap:10px;max-width:460px}
@@ -136,18 +139,19 @@ footer a{color:var(--orange-light);text-decoration:none}
   <div class="hero-grid"></div><div class="hero-scan"></div><div class="hero-glow"></div>
   <div class="hero-inner">
     <div class="hero-left">
-      <span class="badge"><i></i> Android · Versión 1.0.0</span>
+      <span class="badge"><i></i> Android · Versión 1.0.1</span>
       <h1>AvisoPagos<br><span class="acc">en tu celular.</span><span class="dim">Instalala en minutos.</span></h1>
       <p class="lead">Tecnología que <b>funciona desde el primer día</b>. Descargala, instalala y empezá a usarla — <b>sin capacitación.</b></p>
       <form class="gate" id="gate" autocomplete="off">
-        <input id="codigo" type="text" inputmode="numeric" placeholder="Tu código de descarga" aria-label="Código de descarga" required>
+        <!-- type="password": lo que se escribe se ve como puntos. inputmode="numeric" mantiene el teclado de números en el celular -->
+        <input id="codigo" name="codigo-descarga" type="password" inputmode="numeric" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Tu código de descarga" aria-label="Código de descarga" required>
         <button class="btn-primary" id="btn" type="submit">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
           Descargar APK
         </button>
       </form>
       <p class="msg" id="msg" role="status"></p>
-      <p class="meta">AvisoPagos.apk · 955 KB · ¿No tenés código? <a href="https://wa.me/59164542598" style="color:var(--orange-light)">Pedilo por WhatsApp</a></p>
+      <p class="meta">AvisoPagos.apk · 88 KB · ¿No tenés código? <a href="https://wa.me/59164542598" style="color:var(--orange-light)">Pedilo por WhatsApp</a></p>
     </div>
 
     <div class="svc">
@@ -156,6 +160,7 @@ footer a{color:var(--orange-light);text-decoration:none}
       <div class="step"><b>1</b><div><strong>Ingresá tu código</strong><p>Escribilo y tocá Descargar APK. Si Chrome avisa, elegí "Descargar de todos modos".</p></div></div>
       <div class="step"><b>2</b><div><strong>Abrilo</strong><p>Buscalo en las notificaciones o en la carpeta Descargas.</p></div></div>
       <div class="step"><b>3</b><div><strong>Permití la instalación</strong><p>Si Android lo pide, activá "Instalar apps de orígenes desconocidos" para tu navegador.</p></div></div>
+      <div class="note"><strong>¿Ya tenés una versión anterior instalada?</strong> Desinstalala antes de instalar esta, y escribinos por WhatsApp para recibir tu código de licencia nuevo.</div>
     </div>
   </div>
 </section>
@@ -180,6 +185,7 @@ form.addEventListener("submit", async function(ev){
     const d = await r.json();
     if(!d.ok){ say(d.error || "No se pudo verificar el código.", "err"); return; }
     say("Código correcto. Tu descarga empezó.", "ok");
+    inp.value = "";
     const a = document.createElement("a"); a.href = APK_URL; a.download = "AvisoPagos.apk";
     document.body.appendChild(a); a.click(); a.remove();
   }catch(e){
